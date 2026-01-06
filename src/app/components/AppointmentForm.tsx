@@ -1,7 +1,12 @@
-// app/components/AppointmentForm.tsx
 "use client";
 
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Calendar, Clock, Mail, User } from "lucide-react";
 
 export default function AppointmentForm() {
   const [name, setName] = useState("");
@@ -9,10 +14,12 @@ export default function AppointmentForm() {
   const [appointment_date, setAppointmentDate] = useState("");
   const [appointment_time, setAppointmentTime] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setIsSubmitting(true);
 
     try {
       const response = await fetch("/api/appointments", {
@@ -24,52 +31,108 @@ export default function AppointmentForm() {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to create appointment");
+        const data = await response.json();
+        throw new Error(data.error || "Failed to create appointment");
       }
 
+      // Reset form
+      setName("");
+      setEmail("");
+      setAppointmentDate("");
+      setAppointmentTime("");
+      
       // Refresh the page to see the new appointment
       window.location.reload();
     } catch (error: any) {
       setError(error.message);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="p-6 space-y-4 bg-white rounded-lg shadow-md">
-      <input
-        type="text"
-        placeholder="Name"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-        required
-      />
-      <input
-        type="email"
-        placeholder="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-        required
-      />
-      <input
-        type="date"
-        value={appointment_date}
-        onChange={(e) => setAppointmentDate(e.target.value)}
-        className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-        required
-      />
-      <input
-        type="time"
-        value={appointment_time}
-        onChange={(e) => setAppointmentTime(e.target.value)}
-        className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-        required
-      />
-      <button type="submit" className="w-full p-3 text-white transition-colors bg-blue-500 rounded-lg hover:bg-blue-600">
-        Create Appointment
-      </button>
-      {error && <p className="text-red-500">{error}</p>}
-    </form>
+    <Card>
+      <CardHeader>
+        <CardTitle>Schedule Appointment</CardTitle>
+        <CardDescription>
+          Fill in the details below to book your appointment
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="name">Name</Label>
+            <div className="relative">
+              <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              <Input
+                id="name"
+                type="text"
+                placeholder="Enter your name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="pl-9"
+                required
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="email">Email</Label>
+            <div className="relative">
+              <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              <Input
+                id="email"
+                type="email"
+                placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="pl-9"
+                required
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="date">Date</Label>
+            <div className="relative">
+              <Calendar className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              <Input
+                id="date"
+                type="date"
+                value={appointment_date}
+                onChange={(e) => setAppointmentDate(e.target.value)}
+                className="pl-9"
+                required
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="time">Time</Label>
+            <div className="relative">
+              <Clock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              <Input
+                id="time"
+                type="time"
+                value={appointment_time}
+                onChange={(e) => setAppointmentTime(e.target.value)}
+                className="pl-9"
+                required
+              />
+            </div>
+          </div>
+
+          {error && (
+            <Alert variant="destructive">
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+
+          <Button type="submit" className="w-full" disabled={isSubmitting}>
+            {isSubmitting ? "Creating..." : "Create Appointment"}
+          </Button>
+        </form>
+      </CardContent>
+    </Card>
   );
 }
