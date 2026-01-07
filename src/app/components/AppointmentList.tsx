@@ -1,10 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Calendar, Clock, Mail, User, AlertCircle } from "lucide-react";
+import { Calendar, Clock, Mail, User, Trash2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { deleteAppointment } from "../appointments/actions";
 
 interface Appointment {
   id: string;
@@ -14,65 +13,19 @@ interface Appointment {
   appointment_time: string;
 }
 
-export default function AppointmentList() {
-  const [appointments, setAppointments] = useState<Appointment[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+interface AppointmentListProps {
+  appointments: Appointment[];
+}
 
-  useEffect(() => {
-    const fetchAppointments = async () => {
-      try {
-        const response = await fetch("/api/appointments");
-        if (!response.ok) {
-          throw new Error("Failed to fetch appointments");
-        }
-        const data = await response.json();
-        setAppointments(data.appointments || []);
-      } catch (error: any) {
-        setError(error.message);
-      } finally {
-        setLoading(false);
+export default function AppointmentList({ appointments = [] }: AppointmentListProps) {
+  const handleDelete = async (id: string) => {
+    if (confirm("Are you sure you want to delete this appointment?")) {
+      const result = await deleteAppointment(id);
+      if (result.error) {
+        alert(result.error);
       }
-    };
-
-    fetchAppointments();
-  }, []);
-
-  if (loading) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Upcoming Appointments</CardTitle>
-          <CardDescription>Loading your appointments...</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="space-y-2">
-              <Skeleton className="h-4 w-3/4" />
-              <Skeleton className="h-4 w-1/2" />
-              <Skeleton className="h-4 w-2/3" />
-            </div>
-          ))}
-        </CardContent>
-      </Card>
-    );
-  }
-
-  if (error) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Upcoming Appointments</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Alert variant="destructive">
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        </CardContent>
-      </Card>
-    );
-  }
+    }
+  };
 
   return (
     <Card>
@@ -88,8 +41,18 @@ export default function AppointmentList() {
         {appointments.length > 0 ? (
           <div className="space-y-4">
             {appointments.map((appointment) => (
-              <Card key={appointment.id} className="border-l-4 border-l-primary">
+              <Card key={appointment.id} className="border-l-4 border-l-primary relative group">
                 <CardContent className="pt-6">
+                  <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                      onClick={() => handleDelete(appointment.id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
                   <div className="space-y-3">
                     <div className="flex items-center gap-2">
                       <User className="h-4 w-4 text-muted-foreground" />
