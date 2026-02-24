@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 @layer base {
-  :root {
+:root {
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
     --card: 0 0% 100%;
@@ -75,8 +75,113 @@
   * {
     @apply border-border;
   }
-  body {
+body {
     @apply bg-background text-foreground;
     font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
   }
+}
+
+/* Animated background */
+@keyframes gradient-shift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes float-1 {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(30px, -40px) scale(1.05);
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.95);
+  }
+}
+
+@keyframes float-2 {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(-40px, 30px) scale(0.98);
+  }
+  66% {
+    transform: translate(25px, -25px) scale(1.02);
+  }
+}
+
+@keyframes float-3 {
+  0%, 100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(-15px, -30px);
+  }
+}
+
+@keyframes float-4 {
+  0%, 100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(20px, 15px);
+  }
+}
+
+@keyframes float-5 {
+  0%, 100% {
+    transform: translate(-50%, 0) scale(1);
+  }
+  50% {
+    transform: translate(calc(-50% + 20px), -15px) scale(1.03);
+  }
+}
+
+.animated-gradient-mesh {
+  background: linear-gradient(
+    135deg,
+    hsl(var(--primary) / 0.08) 0%,
+    transparent 25%,
+    transparent 50%,
+    hsl(var(--primary) / 0.06) 75%,
+    transparent 100%
+  );
+  background-size: 200% 200%;
+  animation: gradient-shift 15s ease-in-out infinite;
+}
+
+.animated-orb {
+  animation-duration: 20s;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+.animated-orb.orb-1 {
+  animation-name: float-1;
+  animation-delay: 0s;
+}
+
+.animated-orb.orb-2 {
+  animation-name: float-2;
+  animation-delay: -5s;
+}
+
+.animated-orb.orb-3 {
+  animation-name: float-3;
+  animation-delay: -10s;
+}
+
+.animated-orb.orb-4 {
+  animation-name: float-4;
+  animation-delay: -2s;
+}
+
+.animated-orb.orb-5 {
+  animation-name: float-5;
+  animation-delay: -7s;
 }

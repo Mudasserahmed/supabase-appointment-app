@@ -40,13 +40,8 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  // Redirect authenticated users away from auth pages, but allow update-password and verify-email
+  // Redirect authenticated users away from auth pages
   if (request.nextUrl.pathname.startsWith('/auth') && user) {
-    // Allow access to update-password page even if logged in (needed for reset flow)
-    if (request.nextUrl.pathname.startsWith('/auth/update-password')) {
-      return supabaseResponse
-    }
-
     const url = request.nextUrl.clone()
     url.pathname = '/appointments'
     return NextResponse.redirect(url)

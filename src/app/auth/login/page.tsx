@@ -10,8 +10,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Mail, Lock, LogIn, Eye, EyeOff } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
-
 import { Suspense } from "react";
+import AnimatedBackground from "@/app/components/AnimatedBackground";
 
 function LoginForm() {
   const router = useRouter();
@@ -21,6 +21,7 @@ function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -51,7 +52,7 @@ function LoginForm() {
   };
 
   return (
-    <Card className="w-full max-w-md">
+    <Card className="w-full border-border/50  shadow-xl backdrop-blur-sm">
       <CardHeader className="space-y-1">
         <CardTitle className="text-2xl font-bold text-center">Welcome back</CardTitle>
         <CardDescription className="text-center">
@@ -83,11 +84,11 @@ function LoginForm() {
               <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input
                 id="password"
-                type={showPassword ? "text" : "password"}
+                type="password"
                 placeholder="Enter your password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="pl-9 pr-10"
+                className="pl-9"
                 required
                 disabled={isLoading}
               />
@@ -111,26 +112,24 @@ function LoginForm() {
             </Alert>
           )}
 
-          <div className="flex flex-col space-y-4">
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              <LogIn className="mr-2 h-4 w-4" />
-              {isLoading ? "Signing in..." : "Sign in"}
-            </Button>
+          <Button type="submit" className="w-full" disabled={isLoading}>
+            <LogIn className="mr-2 h-4 w-4" />
+            {isLoading ? "Signing in..." : "Sign in"}
+          </Button>
 
-            <div className="flex flex-col space-y-2 text-center text-sm">
-              <Link
+          <div className="text-center text-sm text-muted-foreground">
+          <Link
                 href="/auth/forgot-password"
                 className="text-muted-foreground hover:text-primary underline-offset-4 hover:underline"
               >
                 Forgot your password?
               </Link>
-              <div className="text-muted-foreground">
-                Don't have an account?{" "}
-                <Link href="/auth/signup" className="text-primary hover:underline">
-                  Sign up
-                </Link>
-              </div>
-            </div>
+          <div className="text-muted-foreground">
+            Don&apos;t have an account?{" "}
+            <Link href="/auth/signup" className="text-primary hover:underline">
+              Sign up
+            </Link>
+          </div>
           </div>
         </form>
       </CardContent>
@@ -140,10 +139,13 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-muted/20 p-4">
-      <Suspense fallback={<div>Loading...</div>}>
-        <LoginForm />
-      </Suspense>
+    <main className="relative min-h-screen  flex items-center justify-center p-4">
+      <AnimatedBackground />
+      <div className="relative z-10 w-xl">
+        <Suspense fallback={<div>Loading...</div>}>
+          <LoginForm />
+        </Suspense>
+      </div>
     </main>
   );
 }

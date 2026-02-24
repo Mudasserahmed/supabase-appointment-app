@@ -1,6 +1,7 @@
 import AppointmentForm from "../components/AppointmentForm";
 import AppointmentList from "../components/AppointmentList";
 import UserMenu from "../components/UserMenu";
+import AnimatedBackground from "../components/AnimatedBackground";
 import { createClient } from "@/utils/supabase/server";
 
 export default async function AppointmentsPage() {
@@ -23,8 +24,9 @@ export default async function AppointmentsPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
-      <div className="container mx-auto px-4 py-8 md:py-12">
+    <main className="relative min-h-screen">
+      <AnimatedBackground />
+      <div className="relative container mx-auto px-4 py-8 md:py-12">
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-3">
             Schedule Appointments
