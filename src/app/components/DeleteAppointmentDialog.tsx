@@ -11,6 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { toast } from "sonner";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { deleteAppointment } from "../appointments/actions";
 
@@ -71,6 +72,7 @@ export default function DeleteAppointmentDialog({
       setError(result.error);
       setDeleting(false);
     } else {
+      toast.success("Appointment deleted");
       onDeleted?.();
       handleClose();
       setDeleting(false);

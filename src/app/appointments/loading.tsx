@@ -1,100 +1,69 @@
 import { Skeleton } from "@/components/ui/skeleton";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function Loading() {
-    return (
-        <main className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
-            <div className="container mx-auto px-4 py-8 md:py-12">
-                <div className="text-center mb-12">
-                    {/* Title Skeleton */}
-                    <Skeleton className="h-12 w-64 mx-auto mb-3" />
-                    {/* Subtitle Skeleton */}
-                    <Skeleton className="h-6 w-96 mx-auto" />
-                </div>
+  return (
+    <div className="space-y-8">
+      <div className="flex items-center justify-between flex-wrap gap-4">
+        <div>
+          <Skeleton className="h-9 w-48 mb-2" />
+          <Skeleton className="h-5 w-64" />
+        </div>
+        <Skeleton className="h-9 w-40" />
+      </div>
 
-                <div className="grid grid-cols-1 gap-8 lg:grid-cols-3 max-w-7xl mx-auto">
-                    {/* UserMenu Skeleton */}
-                    <div className="lg:col-span-1">
-                        <Card>
-                            <CardHeader>
-                                <div className="flex items-center gap-4">
-                                    <Skeleton className="h-12 w-12 rounded-full" />
-                                    <div className="space-y-2">
-                                        <Skeleton className="h-4 w-32" />
-                                        <Skeleton className="h-3 w-24" />
-                                    </div>
-                                </div>
-                            </CardHeader>
-                            <CardContent className="space-y-2">
-                                <Skeleton className="h-8 w-full" />
-                                <Skeleton className="h-8 w-full" />
-                                <Skeleton className="h-8 w-full" />
-                            </CardContent>
-                        </Card>
-                    </div>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        {[1, 2, 3].map((i) => (
+          <Card key={i}>
+            <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-4 w-4" />
+            </CardHeader>
+            <CardContent>
+              <Skeleton className="h-9 w-16 mb-2" />
+              <Skeleton className="h-4 w-20" />
+            </CardContent>
+          </Card>
+        ))}
+      </div>
 
-                    <div className="lg:col-span-2 grid grid-cols-1 gap-8 lg:grid-cols-2">
-                        {/* AppointmentForm Skeleton */}
-                        <div className="space-y-2">
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle><Skeleton className="h-6 w-32" /></CardTitle>
-                                    <CardDescription><Skeleton className="h-4 w-48" /></CardDescription>
-                                </CardHeader>
-                                <CardContent className="space-y-4">
-                                    <div className="space-y-2">
-                                        <Skeleton className="h-4 w-16" />
-                                        <Skeleton className="h-10 w-full" />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Skeleton className="h-4 w-16" />
-                                        <Skeleton className="h-10 w-full" />
-                                    </div>
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div className="space-y-2">
-                                            <Skeleton className="h-4 w-16" />
-                                            <Skeleton className="h-10 w-full" />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <Skeleton className="h-4 w-16" />
-                                            <Skeleton className="h-10 w-full" />
-                                        </div>
-                                    </div>
-                                    <Skeleton className="h-10 w-full mt-4" />
-                                </CardContent>
-                            </Card>
-                        </div>
-
-                        {/* AppointmentList Skeleton */}
-                        <div className="space-y-2">
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle><Skeleton className="h-6 w-48" /></CardTitle>
-                                    <CardDescription><Skeleton className="h-4 w-32" /></CardDescription>
-                                </CardHeader>
-                                <CardContent className="space-y-4">
-                                    {[1, 2, 3].map((i) => (
-                                        <div key={i} className="space-y-2 border-l-4 border-l-muted pl-4 py-2">
-                                            <div className="flex items-center gap-2">
-                                                <Skeleton className="h-4 w-4 rounded-full" />
-                                                <Skeleton className="h-5 w-32" />
-                                            </div>
-                                            <div className="flex items-center gap-2">
-                                                <Skeleton className="h-4 w-4 rounded-full" />
-                                                <Skeleton className="h-4 w-48" />
-                                            </div>
-                                            <div className="flex gap-4 mt-2">
-                                                <Skeleton className="h-4 w-24" />
-                                                <Skeleton className="h-4 w-16" />
-                                            </div>
-                                        </div>
-                                    ))}
-                                </CardContent>
-                            </Card>
-                        </div>
-                    </div>
-                </div>
+      <Card>
+        <CardHeader className="space-y-4 pb-4">
+          <div className="flex flex-row items-center justify-between space-y-0">
+            <div>
+              <Skeleton className="h-6 w-32 mb-2" />
+              <Skeleton className="h-4 w-40" />
             </div>
-        </main>
-    );
+            <Skeleton className="h-9 w-20" />
+          </div>
+          <div className="space-y-3">
+            <Skeleton className="h-10 w-full" />
+            <div className="flex gap-2">
+              <Skeleton className="h-8 w-16" />
+              <Skeleton className="h-8 w-20" />
+              <Skeleton className="h-8 w-24" />
+              <Skeleton className="h-8 w-24" />
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="divide-y divide-border -mx-2 space-y-0">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="flex items-center gap-4 px-2 py-4">
+                <Skeleton className="h-10 w-10 rounded-full shrink-0" />
+                <div className="flex-1 min-w-0 space-y-2">
+                  <Skeleton className="h-5 w-32" />
+                  <Skeleton className="h-4 w-48" />
+                </div>
+                <div className="hidden sm:flex flex-col gap-1 items-end">
+                  <Skeleton className="h-4 w-28" />
+                  <Skeleton className="h-4 w-20" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
 }

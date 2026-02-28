@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CalendarDays, LayoutDashboard, LogOut, ChevronDown } from "lucide-react";
+import { CalendarDays, LayoutDashboard, LogOut, ChevronDown, Settings } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 import { cn } from "@/lib/utils";
 
@@ -110,6 +110,14 @@ export default function Navbar({ userEmail, userName }: NavbarProps) {
                   </p>
                 </div>
                 <div className="p-1">
+                  <Link
+                    href="/appointments/settings"
+                    onClick={() => setDropdownOpen(false)}
+                    className="flex items-center gap-2 w-full px-3 py-2 text-sm hover:bg-accent rounded-lg transition-colors"
+                  >
+                    <Settings className="h-4 w-4" />
+                    Settings
+                  </Link>
                   <button
                     onClick={handleSignOut}
                     className="flex items-center gap-2 w-full px-3 py-2 text-sm text-destructive hover:bg-destructive/10 rounded-lg transition-colors cursor-pointer"
