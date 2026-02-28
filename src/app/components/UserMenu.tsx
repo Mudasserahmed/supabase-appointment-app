@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -15,7 +14,6 @@ import { createClient } from "@/utils/supabase/client";
 import type { User } from "@supabase/supabase-js";
 
 export default function UserMenu() {
-  const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -34,18 +32,18 @@ export default function UserMenu() {
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
       if (!session?.user) {
-        router.push("/auth/login");
+        window.location.href = "/auth/login";
       }
     });
 
     return () => subscription.unsubscribe();
-  }, [router]);
+  }, []);
 
   const handleSignOut = async () => {
     const supabase = createClient();
     await supabase.auth.signOut();
-    router.push("/auth/login");
-    router.refresh();
+    // Full page navigation so middleware sees updated cookies and doesn't redirect back
+    window.location.href = "/auth/login";
   };
 
   if (loading) {

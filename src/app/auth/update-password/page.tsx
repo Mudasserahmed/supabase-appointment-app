@@ -58,7 +58,7 @@ export default function UpdatePasswordPage() {
                                 <button
                                     type="button"
                                     onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute right-3 top-3 text-muted-foreground hover:text-foreground"
+                                    className="absolute right-3 top-3 text-muted-foreground hover:text-foreground cursor-pointer"
                                 >
                                     {showPassword ? (
                                         <EyeOff className="h-4 w-4" />
@@ -86,7 +86,7 @@ export default function UpdatePasswordPage() {
                                 <button
                                     type="button"
                                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                                    className="absolute right-3 top-3 text-muted-foreground hover:text-foreground"
+                                    className="absolute right-3 top-3 text-muted-foreground hover:text-foreground cursor-pointer"
                                 >
                                     {showConfirmPassword ? (
                                         <EyeOff className="h-4 w-4" />

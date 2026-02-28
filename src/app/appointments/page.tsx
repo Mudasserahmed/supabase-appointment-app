@@ -1,12 +1,12 @@
-import AppointmentForm from "../components/AppointmentForm";
-import AppointmentList from "../components/AppointmentList";
-import UserMenu from "../components/UserMenu";
-import AnimatedBackground from "../components/AnimatedBackground";
+import { Suspense } from "react";
 import { createClient } from "@/utils/supabase/server";
+import AppointmentsDashboard from "../components/AppointmentsDashboard";
 
 export default async function AppointmentsPage() {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   let appointments: any[] = [];
 
@@ -18,39 +18,28 @@ export default async function AppointmentsPage() {
       .order("appointment_date", { ascending: true })
       .order("appointment_time", { ascending: true });
 
-    if (data) {
-      appointments = data;
-    }
+    if (data) appointments = data;
   }
 
-  return (
-    <main className="relative min-h-screen">
-      <AnimatedBackground />
-      <div className="relative container mx-auto px-4 py-8 md:py-12">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-3">
-            Schedule Appointments
-          </h1>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Manage your appointments with ease. Schedule, view, and organize your bookings all in one place.
-          </p>
-        </div>
+  const today = new Date().toISOString().split("T")[0];
+  const nextWeek = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+    .toISOString()
+    .split("T")[0];
 
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3 max-w-7xl mx-auto">
-          <div className="lg:col-span-1">
-            <UserMenu />
-          </div>
-          <div className="lg:col-span-2 grid grid-cols-1 gap-8 lg:grid-cols-2">
-            <div className="space-y-2">
-              <AppointmentForm />
-            </div>
-            <div className="space-y-2">
-              <AppointmentList appointments={appointments} />
-            </div>
-          </div>
-        </div>
-      </div>
-    </main>
+  const todayCount = appointments.filter(
+    (a) => a.appointment_date === today
+  ).length;
+  const weekCount = appointments.filter(
+    (a) => a.appointment_date >= today && a.appointment_date <= nextWeek
+  ).length;
+
+  return (
+    <Suspense fallback={<div className="animate-pulse space-y-8">Loading...</div>}>
+      <AppointmentsDashboard
+        appointments={appointments}
+        todayCount={todayCount}
+        weekCount={weekCount}
+      />
+    </Suspense>
   );
 }
-
