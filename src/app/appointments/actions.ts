@@ -19,6 +19,7 @@ export async function createAppointment(formData: FormData) {
     const duration_minutes = parseInt(formData.get("duration_minutes") as string, 10) || 60;
     const type = (formData.get("type") as string) || "Other";
     const location = (formData.get("location") as string) || null;
+    const recurrence_rule = (formData.get("recurrence_rule") as string) || null;
 
     if (!name || !email || !appointment_date || !appointment_time) {
         return { error: "Missing required fields" };
@@ -35,6 +36,8 @@ export async function createAppointment(formData: FormData) {
             duration_minutes,
             type,
             location,
+            status: "confirmed",
+            recurrence_rule: recurrence_rule || null,
             user_id: user.id
         }]);
 
@@ -62,6 +65,8 @@ export async function updateAppointment(id: string, formData: FormData) {
     const duration_minutes = parseInt(formData.get("duration_minutes") as string, 10) || 60;
     const type = (formData.get("type") as string) || "Other";
     const location = (formData.get("location") as string) || null;
+    const status = (formData.get("status") as string) || "confirmed";
+    const recurrence_rule = (formData.get("recurrence_rule") as string) || null;
 
     if (!name || !email || !appointment_date || !appointment_time) {
         return { error: "Missing required fields" };
@@ -78,6 +83,8 @@ export async function updateAppointment(id: string, formData: FormData) {
             duration_minutes,
             type,
             location,
+            status,
+            recurrence_rule: recurrence_rule || null,
         })
         .eq("id", id)
         .eq("user_id", user.id);
@@ -100,7 +107,7 @@ export async function deleteAppointment(id: string) {
 
     const { error } = await supabase
         .from("appointments")
-        .delete()
+        .update({ status: "cancelled" })
         .eq("id", id)
         .eq("user_id", user.id);
 
@@ -110,4 +117,44 @@ export async function deleteAppointment(id: string) {
 
     revalidatePath("/appointments");
     return { success: true };
+}
+
+export async function exportAppointmentsCSV(): Promise<{ csv: string } | { error: string }> {
+    const supabase = await createClient();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+        return { error: "Unauthorized" };
+    }
+
+    const { data: appointments, error } = await supabase
+        .from("appointments")
+        .select("*")
+        .eq("user_id", user.id)
+        .or("status.neq.cancelled,status.is.null")
+        .order("appointment_date", { ascending: true })
+        .order("appointment_time", { ascending: true });
+
+    if (error) return { error: error.message };
+    if (!appointments?.length) return { csv: "name,email,date,time,duration,type,location,notes,status\n" };
+
+    const headers = ["name", "email", "date", "time", "duration", "type", "location", "notes", "status"];
+    const escape = (v: unknown) => {
+        const s = String(v ?? "");
+        return s.includes(",") || s.includes('"') || s.includes("\n")
+            ? `"${s.replace(/"/g, '""')}"`
+            : s;
+    };
+
+    const rows = appointments.map((a) =>
+        headers
+            .map((h) => {
+                const key = h === "date" ? "appointment_date" : h === "time" ? "appointment_time" : h === "duration" ? "duration_minutes" : h;
+                return escape((a as Record<string, unknown>)[key]);
+            })
+            .join(",")
+    );
+
+    const csv = [headers.join(","), ...rows].join("\n");
+    return { csv };
 }

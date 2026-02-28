@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
@@ -13,6 +13,8 @@ import {
   Pencil,
   Search,
   MapPin,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -30,6 +32,8 @@ interface Appointment {
   duration_minutes?: number;
   type?: string;
   location?: string | null;
+  status?: string | null;
+  recurrence_rule?: string | null;
 }
 
 interface AppointmentListProps {
@@ -73,7 +77,10 @@ function isUpcoming(dateStr: string) {
   return dateStr >= new Date().toISOString().split("T")[0];
 }
 
+const PAGE_SIZE = 10;
+
 type DateFilter = "all" | "today" | "week" | "month";
+type StatusFilter = "all" | "confirmed" | "completed";
 type SortOption = "date-asc" | "date-desc" | "name-asc" | "name-desc";
 
 function getDateRange(filter: DateFilter) {
@@ -99,7 +106,9 @@ export default function AppointmentList({
   const [editId, setEditId] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [dateFilter, setDateFilter] = useState<DateFilter>("all");
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [sort, setSort] = useState<SortOption>("date-asc");
+  const [page, setPage] = useState(1);
 
   const filteredAppointments = useMemo(() => {
     let result = appointments;
@@ -126,6 +135,11 @@ export default function AppointmentList({
         (a) => a.appointment_date >= start && a.appointment_date <= end
       );
     }
+    if (statusFilter !== "all") {
+      result = result.filter(
+        (a) => (a.status ?? "confirmed") === statusFilter
+      );
+    }
     result = [...result].sort((a, b) => {
       if (sort === "date-asc") {
         const d = a.appointment_date.localeCompare(b.appointment_date);
@@ -139,7 +153,15 @@ export default function AppointmentList({
       return b.name.localeCompare(a.name);
     });
     return result;
-  }, [appointments, search, dateFilter, sort]);
+  }, [appointments, search, dateFilter, statusFilter, sort]);
+
+  useEffect(() => setPage(1), [search, dateFilter, statusFilter, sort]);
+
+  const totalPages = Math.ceil(filteredAppointments.length / PAGE_SIZE) || 1;
+  const paginatedAppointments = filteredAppointments.slice(
+    (page - 1) * PAGE_SIZE,
+    page * PAGE_SIZE
+  );
 
   const appointmentToDelete = confirmDeleteId
     ? appointments.find((a) => a.id === confirmDeleteId) ?? null
@@ -147,6 +169,8 @@ export default function AppointmentList({
 
   const openDeleteConfirm = (id: string) => setConfirmDeleteId(id);
   const closeDeleteConfirm = () => setConfirmDeleteId(null);
+
+  const goToPage = (p: number) => setPage(Math.max(1, Math.min(p, totalPages)));
   const appointmentToEdit = editId
     ? appointments.find((a) => a.id === editId) ?? null
     : null;
@@ -156,6 +180,12 @@ export default function AppointmentList({
     { value: "today", label: "Today" },
     { value: "week", label: "This Week" },
     { value: "month", label: "This Month" },
+  ];
+
+  const statusFilterChips: { value: StatusFilter; label: string }[] = [
+    { value: "all", label: "All" },
+    { value: "confirmed", label: "Confirmed" },
+    { value: "completed", label: "Completed" },
   ];
 
   const sortOptions: { value: SortOption; label: string }[] = [
@@ -226,6 +256,20 @@ export default function AppointmentList({
                     {label}
                   </button>
                 ))}
+                {statusFilterChips.map(({ value, label }) => (
+                  <button
+                    key={value}
+                    type="button"
+                    onClick={() => setStatusFilter(value)}
+                    className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors cursor-pointer ${
+                      statusFilter === value
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-muted hover:bg-muted/80 text-muted-foreground"
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
               </div>
               <select
                 value={sort}
@@ -275,8 +319,9 @@ export default function AppointmentList({
               ))}
           </div>
         ) : (
+          <>
           <div className="divide-y divide-border -mx-2">
-            {filteredAppointments.map((appointment) => {
+            {paginatedAppointments.map((appointment) => {
               const today = isToday(appointment.appointment_date);
               const upcoming = isUpcoming(appointment.appointment_date);
 
@@ -311,11 +356,27 @@ export default function AppointmentList({
                         {appointment.email}
                       </p>
                     </div>
-                    {appointment.type && appointment.type !== "Other" && (
-                      <span className="inline-block mt-1.5 text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full font-medium">
-                        {appointment.type}
-                      </span>
-                    )}
+                    <div className="flex flex-wrap gap-1.5 mt-1.5">
+                      {appointment.type && appointment.type !== "Other" && (
+                        <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full font-medium">
+                          {appointment.type}
+                        </span>
+                      )}
+                      {appointment.status && appointment.status !== "confirmed" && (
+                        <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                          appointment.status === "completed"
+                            ? "bg-green-500/10 text-green-700 dark:text-green-400"
+                            : "bg-muted text-muted-foreground"
+                        }`}>
+                          {appointment.status}
+                        </span>
+                      )}
+                      {appointment.recurrence_rule && (
+                        <span className="text-xs bg-blue-500/10 text-blue-700 dark:text-blue-400 px-2 py-0.5 rounded-full font-medium">
+                          Repeats {appointment.recurrence_rule}
+                        </span>
+                      )}
+                    </div>
                     {appointment.notes && (
                       <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
                         {appointment.notes}
@@ -377,6 +438,40 @@ export default function AppointmentList({
               );
             })}
           </div>
+
+          {filteredAppointments.length > PAGE_SIZE && (
+            <div className="flex items-center justify-between pt-4 border-t">
+              <p className="text-sm text-muted-foreground">
+                Showing {(page - 1) * PAGE_SIZE + 1}–
+                {Math.min(page * PAGE_SIZE, filteredAppointments.length)} of{" "}
+                {filteredAppointments.length}
+              </p>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => goToPage(page - 1)}
+                  disabled={page <= 1}
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                  Previous
+                </Button>
+                <span className="text-sm">
+                  Page {page} of {totalPages}
+                </span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => goToPage(page + 1)}
+                  disabled={page >= totalPages}
+                >
+                  Next
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          )}
+          </>
         )}
       </CardContent>
 
@@ -402,6 +497,8 @@ export default function AppointmentList({
                 duration_minutes: appointmentToEdit.duration_minutes,
                 type: appointmentToEdit.type,
                 location: appointmentToEdit.location,
+                status: appointmentToEdit.status,
+                recurrence_rule: appointmentToEdit.recurrence_rule,
               }
             : null
         }

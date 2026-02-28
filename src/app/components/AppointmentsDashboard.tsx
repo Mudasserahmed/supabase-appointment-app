@@ -11,9 +11,12 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { Plus, CalendarDays, Clock, TrendingUp } from "lucide-react";
+import { Plus, CalendarDays, Clock, TrendingUp, Download, List, Calendar as CalendarIcon } from "lucide-react";
 import AppointmentList from "./AppointmentList";
 import AppointmentForm from "./AppointmentForm";
+import AppointmentCalendar from "./AppointmentCalendar";
+import { toast } from "sonner";
+import { exportAppointmentsCSV } from "../appointments/actions";
 
 interface Appointment {
   id: string;
@@ -58,6 +61,7 @@ export default function AppointmentsDashboard({
   const router = useRouter();
   const searchParams = useSearchParams();
   const [modalOpen, setModalOpen] = useState(false);
+  const [viewMode, setViewMode] = useState<"list" | "calendar">("list");
 
   const openModal = () => setModalOpen(true);
   const closeModal = () => {
@@ -76,6 +80,22 @@ export default function AppointmentsDashboard({
   const handleFormSuccess = () => {
     closeModal();
     router.refresh();
+  };
+
+  const handleExportCSV = async () => {
+    const result = await exportAppointmentsCSV();
+    if ("error" in result) {
+      toast.error(result.error);
+      return;
+    }
+    const blob = new Blob([result.csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `appointments-${new Date().toISOString().split("T")[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success("Appointments exported");
   };
 
   const stats = statsConfig.map(({ label, valueKey, sub, icon: Icon }) => ({
@@ -100,10 +120,21 @@ export default function AppointmentsDashboard({
             Manage and track your appointments
           </p>
         </div>
-        <Button size="sm" className="gap-2" onClick={openModal}>
-          <Plus className="h-4 w-4" />
-          New Appointment
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            size="sm"
+            variant="outline"
+            className="gap-2"
+            onClick={handleExportCSV}
+          >
+            <Download className="h-4 w-4" />
+            Export CSV
+          </Button>
+          <Button size="sm" className="gap-2" onClick={openModal}>
+            <Plus className="h-4 w-4" />
+            New Appointment
+          </Button>
+        </div>
       </div>
 
       {/* Stats */}
@@ -124,8 +155,34 @@ export default function AppointmentsDashboard({
         ))}
       </div>
 
-      {/* Appointment list */}
-      <AppointmentList appointments={appointments} onNewClick={openModal} />
+      {/* View toggle */}
+      <div className="flex gap-2">
+        <Button
+          variant={viewMode === "list" ? "default" : "outline"}
+          size="sm"
+          className="gap-2"
+          onClick={() => setViewMode("list")}
+        >
+          <List className="h-4 w-4" />
+          List
+        </Button>
+        <Button
+          variant={viewMode === "calendar" ? "default" : "outline"}
+          size="sm"
+          className="gap-2"
+          onClick={() => setViewMode("calendar")}
+        >
+          <CalendarIcon className="h-4 w-4" />
+          Calendar
+        </Button>
+      </div>
+
+      {/* Appointment list or calendar */}
+      {viewMode === "list" ? (
+        <AppointmentList appointments={appointments} onNewClick={openModal} />
+      ) : (
+        <AppointmentCalendar appointments={appointments} />
+      )}
 
       {/* New Appointment Modal */}
       <Dialog open={modalOpen} onOpenChange={(open) => !open && closeModal()}>

@@ -15,6 +15,7 @@ export default async function AppointmentsPage() {
       .from("appointments")
       .select("*")
       .eq("user_id", user.id)
+      .or("status.neq.cancelled,status.is.null")
       .order("appointment_date", { ascending: true })
       .order("appointment_time", { ascending: true });
 

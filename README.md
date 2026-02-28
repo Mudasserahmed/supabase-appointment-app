@@ -20,6 +20,28 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+## Database Migrations
+
+Run these SQL statements in your Supabase SQL Editor to enable all features:
+
+```sql
+-- Initial fields
+ALTER TABLE appointments ADD COLUMN IF NOT EXISTS notes TEXT;
+ALTER TABLE appointments ADD COLUMN IF NOT EXISTS duration_minutes INTEGER DEFAULT 60;
+ALTER TABLE appointments ADD COLUMN IF NOT EXISTS type VARCHAR(50) DEFAULT 'Other';
+ALTER TABLE appointments ADD COLUMN IF NOT EXISTS location TEXT;
+
+-- Status, recurrence, reminders
+ALTER TABLE appointments ADD COLUMN IF NOT EXISTS status VARCHAR(20) DEFAULT 'confirmed';
+UPDATE appointments SET status = 'confirmed' WHERE status IS NULL;
+ALTER TABLE appointments ADD COLUMN IF NOT EXISTS recurrence_rule VARCHAR(50);
+ALTER TABLE appointments ADD COLUMN IF NOT EXISTS parent_id UUID REFERENCES appointments(id);
+ALTER TABLE appointments ADD COLUMN IF NOT EXISTS reminder_24h_sent BOOLEAN DEFAULT FALSE;
+ALTER TABLE appointments ADD COLUMN IF NOT EXISTS reminder_1h_sent BOOLEAN DEFAULT FALSE;
+```
+
+Or use Supabase CLI: `supabase db push`
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:

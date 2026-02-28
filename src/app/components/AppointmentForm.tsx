@@ -26,6 +26,19 @@ export const APPOINTMENT_TYPES = [
   "Other",
 ] as const;
 
+export const APPOINTMENT_STATUSES = [
+  "confirmed",
+  "completed",
+  "cancelled",
+] as const;
+
+export const RECURRENCE_OPTIONS = [
+  { value: "", label: "None" },
+  { value: "daily", label: "Daily" },
+  { value: "weekly", label: "Weekly" },
+  { value: "monthly", label: "Monthly" },
+] as const;
+
 export interface AppointmentFormData {
   id?: string;
   name: string;
@@ -36,6 +49,8 @@ export interface AppointmentFormData {
   duration_minutes?: number;
   type?: string;
   location?: string | null;
+  status?: string | null;
+  recurrence_rule?: string | null;
 }
 
 interface AppointmentFormProps {
@@ -60,6 +75,8 @@ export default function AppointmentForm({
   );
   const [type, setType] = useState(initialData?.type ?? "Other");
   const [location, setLocation] = useState(initialData?.location ?? "");
+  const [status, setStatus] = useState(initialData?.status ?? "confirmed");
+  const [recurrence_rule, setRecurrenceRule] = useState(initialData?.recurrence_rule ?? "");
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -92,6 +109,8 @@ export default function AppointmentForm({
     formData.append("duration_minutes", duration_minutes);
     formData.append("type", type);
     formData.append("location", location);
+    formData.append("recurrence_rule", recurrence_rule || "");
+    if (initialData?.id) formData.append("status", status);
 
     try {
       const isEdit = !!initialData?.id;
@@ -247,6 +266,40 @@ export default function AppointmentForm({
                 className="pl-9"
               />
             </div>
+          </div>
+
+          {initialData?.id && (
+            <div className="space-y-2">
+              <Label htmlFor="status">Status</Label>
+              <select
+                id="status"
+                value={status}
+                onChange={(e) => setStatus(e.target.value)}
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              >
+                {APPOINTMENT_STATUSES.map((s) => (
+                  <option key={s} value={s}>
+                    {s.charAt(0).toUpperCase() + s.slice(1)}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+
+          <div className="space-y-2">
+            <Label htmlFor="recurrence">Recurrence</Label>
+            <select
+              id="recurrence"
+              value={recurrence_rule}
+              onChange={(e) => setRecurrenceRule(e.target.value)}
+              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            >
+              {RECURRENCE_OPTIONS.map(({ value, label }) => (
+                <option key={value || "none"} value={value}>
+                  {label}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div className="space-y-2">
