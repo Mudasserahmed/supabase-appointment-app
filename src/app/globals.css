@@ -189,3 +189,36 @@ body {
   animation-name: float-5;
   animation-delay: -7s;
 }
+
+/* React Big Calendar dark mode */
+.dark .rbc-calendar {
+  --rbc-background-color: hsl(var(--card));
+  --rbc-border-color: hsl(var(--border));
+  --rbc-off-range-bg: hsl(var(--muted));
+  --rbc-today-bg: hsl(var(--primary) / 0.15);
+  --rbc-event-bg: hsl(var(--primary));
+  --rbc-event-border: hsl(var(--primary));
+}
+.dark .rbc-header,
+.dark .rbc-month-view,
+.dark .rbc-time-view,
+.dark .rbc-day-bg,
+.dark .rbc-time-slot,
+.dark .rbc-timeslot-group {
+  border-color: hsl(var(--border));
+}
+.dark .rbc-toolbar button {
+  color: hsl(var(--foreground));
+  border-color: hsl(var(--border));
+}
+.dark .rbc-toolbar button:hover,
+.dark .rbc-toolbar button.rbc-active {
+  background: hsl(var(--accent));
+  color: hsl(var(--accent-foreground));
+}
+.dark .rbc-date-cell {
+  color: hsl(var(--foreground));
+}
+.dark .rbc-off-range .rbc-date-cell {
+  color: hsl(var(--muted-foreground));
+}

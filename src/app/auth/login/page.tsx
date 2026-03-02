@@ -12,6 +12,7 @@ import { Mail, Lock, LogIn, Eye, EyeOff } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 import { Suspense } from "react";
 import AnimatedBackground from "@/app/components/AnimatedBackground";
+import ThemeToggle from "@/app/components/ThemeToggle";
 
 function LoginForm() {
   const router = useRouter();
@@ -140,6 +141,7 @@ function LoginForm() {
 export default function LoginPage() {
   return (
     <main className="relative min-h-screen  flex items-center justify-center p-4">
+      <ThemeToggle className="fixed top-4 right-4 z-20" />
       <AnimatedBackground />
       <div className="relative z-10 w-xl">
         <Suspense fallback={<div>Loading...</div>}>

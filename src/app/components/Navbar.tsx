@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { CalendarDays, LayoutDashboard, LogOut, ChevronDown, Settings } from "lucide-react";
+import ThemeToggle from "./ThemeToggle";
 import { createClient } from "@/utils/supabase/client";
 import { cn } from "@/lib/utils";
 
@@ -110,6 +111,7 @@ export default function Navbar({ userEmail, userName }: NavbarProps) {
                   </p>
                 </div>
                 <div className="p-1">
+                  <ThemeToggle variant="dropdown" onClick={() => setDropdownOpen(false)} />
                   <Link
                     href="/appointments/settings"
                     onClick={() => setDropdownOpen(false)}

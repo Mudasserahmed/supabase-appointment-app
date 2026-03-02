@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Lock, Save, Eye, EyeOff } from "lucide-react";
 import { updatePassword } from "./actions";
+import ThemeToggle from "@/app/components/ThemeToggle";
 
 export default function UpdatePasswordPage() {
     const [error, setError] = useState<string | null>(null);
@@ -31,7 +32,8 @@ export default function UpdatePasswordPage() {
     };
 
     return (
-        <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-muted/20 p-4">
+        <main className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-muted/20 p-4">
+            <ThemeToggle className="fixed top-4 right-4 z-20" />
             <Card className="w-full max-w-md">
                 <CardHeader className="space-y-1">
                     <CardTitle className="text-2xl font-bold text-center">Update Password</CardTitle>

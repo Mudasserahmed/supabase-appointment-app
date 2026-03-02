@@ -11,6 +11,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Mail, Lock, UserPlus, User } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 import AnimatedBackground from "@/app/components/AnimatedBackground";
+import ThemeToggle from "@/app/components/ThemeToggle";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -65,6 +66,7 @@ export default function SignupPage() {
 
   return (
     <main className="relative min-h-screen flex items-center justify-center p-4">
+      <ThemeToggle className="fixed top-4 right-4 z-20" />
       <AnimatedBackground />
       <div className="relative z-10">
       <Card className="w-full max-w-md border-border/50 bg-card/95 shadow-xl backdrop-blur-sm">
