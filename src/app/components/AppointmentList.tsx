@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
@@ -15,6 +15,7 @@ import {
   MapPin,
   ChevronLeft,
   ChevronRight,
+  Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -105,28 +106,27 @@ export default function AppointmentList({
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [editId, setEditId] = useState<string | null>(null);
   const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [dateFilter, setDateFilter] = useState<DateFilter>("all");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [sort, setSort] = useState<SortOption>("date-asc");
   const [page, setPage] = useState(1);
+  const [, startTransition] = useTransition();
+
+  const isSearching = search !== debouncedSearch;
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(search), 300);
+    return () => clearTimeout(timer);
+  }, [search]);
 
   const filteredAppointments = useMemo(() => {
     let result = appointments;
-    const q = search.toLowerCase().trim();
+    const q = debouncedSearch.toLowerCase().trim();
     if (q) {
       result = result.filter((a) => {
         const name = String(a.name ?? "").toLowerCase();
-        const email = String(a.email ?? "").toLowerCase();
-        const notes = String(a.notes ?? "").toLowerCase();
-        const location = String(a.location ?? "").toLowerCase();
-        const type = String(a.type ?? "").toLowerCase();
-        return (
-          name.includes(q) ||
-          email.includes(q) ||
-          notes.includes(q) ||
-          location.includes(q) ||
-          type.includes(q)
-        );
+        return name.includes(q);
       });
     }
     const { start, end } = getDateRange(dateFilter);
@@ -153,9 +153,11 @@ export default function AppointmentList({
       return b.name.localeCompare(a.name);
     });
     return result;
-  }, [appointments, search, dateFilter, statusFilter, sort]);
+  }, [appointments, debouncedSearch, dateFilter, statusFilter, sort]);
 
-  useEffect(() => setPage(1), [search, dateFilter, statusFilter, sort]);
+  useEffect(() => {
+    startTransition(() => setPage(1));
+  }, [debouncedSearch, dateFilter, statusFilter, sort]);
 
   const totalPages = Math.ceil(filteredAppointments.length / PAGE_SIZE) || 1;
   const paginatedAppointments = filteredAppointments.slice(
@@ -231,13 +233,17 @@ export default function AppointmentList({
         {appointments.length > 0 && (
           <div className="space-y-3">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              {isSearching ? (
+                <Loader2 className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground animate-spin" />
+              ) : (
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              )}
               <Input
-                placeholder="Search by name, email, notes, location..."
+                placeholder="Search by name..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="pl-9"
-                aria-label="Search appointments"
+                aria-label="Search appointments by name"
               />
             </div>
             <div className="flex flex-wrap items-center gap-3">
@@ -288,7 +294,12 @@ export default function AppointmentList({
       </CardHeader>
 
       <CardContent>
-        {filteredAppointments.length === 0 ? (
+        {isSearching ? (
+          <div className="flex flex-col items-center justify-center py-16">
+            <Loader2 className="h-10 w-10 text-primary animate-spin mb-4" />
+            <p className="text-sm text-muted-foreground">Searching...</p>
+          </div>
+        ) : filteredAppointments.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-center">
             <div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center mb-4">
               <CalendarX className="h-8 w-8 text-muted-foreground" />
