@@ -37,7 +37,8 @@ export default function ForgotPasswordPage() {
     return (
         <main className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-muted/20 p-4">
             <ThemeToggle className="fixed top-4 right-4 z-20" />
-            <Card className="w-full max-w-md">
+            <div className="relative z-10 w-full max-w-md">
+            <Card className="w-full border-border/50 shadow-xl backdrop-blur-sm">
                 <CardHeader className="space-y-1">
                     <CardTitle className="text-2xl font-bold text-center">Reset Password</CardTitle>
                     <CardDescription className="text-center">
@@ -88,6 +89,7 @@ export default function ForgotPasswordPage() {
                     </form>
                 </CardContent>
             </Card>
+            </div>
         </main>
     );
 }

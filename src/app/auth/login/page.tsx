@@ -53,7 +53,7 @@ function LoginForm() {
   };
 
   return (
-    <Card className="w-full border-border/50  shadow-xl backdrop-blur-sm">
+    <Card className="w-full max-w-md border-border/50 shadow-xl backdrop-blur-sm">
       <CardHeader className="space-y-1">
         <CardTitle className="text-2xl font-bold text-center">Welcome back</CardTitle>
         <CardDescription className="text-center">
@@ -143,7 +143,7 @@ export default function LoginPage() {
     <main className="relative min-h-screen  flex items-center justify-center p-4">
       <ThemeToggle className="fixed top-4 right-4 z-20" />
       <AnimatedBackground />
-      <div className="relative z-10 w-xl">
+      <div className="relative z-10 w-full max-w-md">
         <Suspense fallback={<div>Loading...</div>}>
           <LoginForm />
         </Suspense>

@@ -68,8 +68,8 @@ export default function SignupPage() {
     <main className="relative min-h-screen flex items-center justify-center p-4">
       <ThemeToggle className="fixed top-4 right-4 z-20" />
       <AnimatedBackground />
-      <div className="relative z-10">
-      <Card className="w-full max-w-md border-border/50 bg-card/95 shadow-xl backdrop-blur-sm">
+      <div className="relative z-10 w-full max-w-md">
+      <Card className="w-full border-border/50 bg-card/95 shadow-xl backdrop-blur-sm">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold text-center">Create an account</CardTitle>
           <CardDescription className="text-center">
